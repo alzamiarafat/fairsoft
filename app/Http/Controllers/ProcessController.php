@@ -162,8 +162,6 @@ class ProcessController extends Controller
         $process->link = $request->link;
         $process->link_name = $request->link_name;
 
-        $process->update();
-
         return redirect()->route('admin.landing.processes.index')->withStatus(__('Process was updated'));
     }
 

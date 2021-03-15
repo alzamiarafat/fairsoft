@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'version' => '2.2.3',
+    'version' => '2.1.8',
     'env'=>[
         [
             'name'=>'Setup',
@@ -74,10 +74,6 @@ return [
                 ['title'=>'Debug app level', 'type'=>'hidden', 'key'=>'APP_LOG_LEVEL', 'value'=>'debug', 'data'=>['debug'=>'Debug', 'error'=>'Error']],
                 ['separator'=>'Links', 'title'=>'Link to terms and services', 'key'=>'LINK_TO_TS', 'value'=>"/blog/terms-and-conditions"],
                 [ 'title'=>'Link to privacy policy', 'key'=>'LINK_TO_PR', 'value'=>"/blog/how-it-works"],
-            
-                ['separator'=>"Custom fields on order", 'title'=>'Label on the custom fields', 'key'=>'LABEL_ON_CUSTOM_FIELDS', 'value'=>"Customer Info"]
-                
-            
             ],
         ],
 
@@ -121,9 +117,9 @@ return [
         ],
         [],
         [
-            'name'=>'Apps & Plugins',
+            'name'=>'Plugins',
             'slug'=>'plugins',
-            'icon'=>'ni ni-spaceship',
+            'icon'=>'ni ni-ui-04',
             'fields'=>[
 
                 

@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class CouponsController extends Controller
 {
@@ -68,9 +69,55 @@ class CouponsController extends Controller
      */
     public function index()
     {
-        $this->authChecker();
+    //   $this->authChecker();
+        $data = $this->getRestaurant();
 
-        return view($this->view_path.'index', ['setup' => [
+
+        if(auth()->user()->hasRole('owner')){
+
+            return view($this->view_path.'index', ['setup' => [
+                'title'=>__('crud.item_managment', ['item'=>__($this->titlePlural)]),
+                'action_link'=>route($this->webroute_path.'create'),
+                'action_name'=>__('crud.add_new_item', ['item'=>__($this->title)]),
+                'items'=>$this->getRestaurant()->coupons()->paginate(config('settings.paginate')),
+                'item_names'=>$this->titlePlural,
+                'webroute_path'=>$this->webroute_path,
+                'fields'=>$this->getFields(),
+                'parameter_name'=>$this->parameter_name,
+            ]]);
+
+        }
+        else{
+            return view($this->view_path.'index', ['setup' => [
+                    'title'=>__('crud.item_managment', ['item'=>__($this->titlePlural)]),
+                    'action_link'=>route($this->webroute_path.'create'),
+                    'action_name'=>__('crud.add_new_item', ['item'=>__($this->title)]),
+                    'items'=>$data,
+                    'item_names'=>$this->titlePlural,
+                    'webroute_path'=>$this->webroute_path,
+                    'fields'=>$this->getFields(),
+                    'parameter_name'=>$this->parameter_name,
+            ]]);
+        }
+
+
+        /*return ['setup' => [
+            'title'=>__('crud.item_managment', ['item'=>__($this->titlePlural)]),
+            'action_link'=>route($this->webroute_path.'create'),
+            'action_name'=>__('crud.add_new_item', ['item'=>__($this->title)]),
+            if (auth()->user()->hasRole('admin')){
+                'items'$this->getRestaurant()->coupons()->paginate(config('settings.paginate')),
+
+            }
+
+            auth()->user(),
+            'item_names'=>$this->titlePlural,
+            'webroute_path'=>$this->webroute_path,
+            'fields'=>$this->getFields(),
+            'parameter_name'=>$this->parameter_name,
+        ]];*/
+
+        /*return view($this->view_path.'index', ['setup' => [
             'title'=>__('crud.item_managment', ['item'=>__($this->titlePlural)]),
             'action_link'=>route($this->webroute_path.'create'),
             'action_name'=>__('crud.add_new_item', ['item'=>__($this->title)]),
@@ -79,7 +126,11 @@ class CouponsController extends Controller
             'webroute_path'=>$this->webroute_path,
             'fields'=>$this->getFields(),
             'parameter_name'=>$this->parameter_name,
-        ]]);
+        ]]);*/
+
+
+        // $data['cou'] =Coupons::get();
+         /*return view ('coupons.index', $data);*/
     }
 
     /**
@@ -89,7 +140,7 @@ class CouponsController extends Controller
      */
     public function create()
     {
-        $this->authChecker();
+        // $this->authChecker();
 
         return view('coupons.create');
     }
@@ -102,21 +153,39 @@ class CouponsController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authChecker();
-        $item = $this->provider::create([
-            'name' => $request->name,
-            'code' => strtoupper(substr($this->getRestaurant()->name, 0, 2).(Str::random(6))),
-            'type' => $request->type,
-            'price' => $request->type == 0 ? $request->price_fixed : $request->price_percentage,
-            'active_from' => $request->active_from,
-            'active_to' => $request->active_to,
-            'limit_to_num_uses' => $request->limit_to_num_uses,
-            'restaurant_id' => $this->getRestaurant()->id,
-        ]);
+        // $this->authChecker();
+        if(auth()->user()->hasRole('owner')) {
+            $item = $this->provider::create([
+                'name' => $request->name,
+                'code' => strtoupper(substr($this->getRestaurant()->name, 0, 2) . (Str::random(6))),
+                'type' => $request->type,
+                'price' => $request->type == 0 ? $request->price_fixed : $request->price_percentage,
+                'active_from' => $request->active_from,
+                'active_to' => $request->active_to,
+                'limit_to_num_uses' => $request->limit_to_num_uses,
+                'restaurant_id' => $this->getRestaurant()->id,
+            ]);
 
-        $item->save();
+            $item->save();
 
-        return redirect()->route($this->webroute_path.'index')->withStatus(__('crud.item_has_been_added', ['item'=>__($this->title)]));
+            return redirect()->route($this->webroute_path . 'index')->withStatus(__('crud.item_has_been_added', ['item' => __($this->title)]));
+        }
+        else{
+            $item = $this->provider::create([
+                'name' => $request->name,
+                'code' => strtoupper(Str::random(6)),
+                'type' => $request->type,
+                'price' => $request->type == 0 ? $request->price_fixed : $request->price_percentage,
+                'active_from' => $request->active_from,
+                'active_to' => $request->active_to,
+                'limit_to_num_uses' => $request->limit_to_num_uses,
+                'restaurant_id' => 15
+            ]);
+
+            $item->save();
+
+            return redirect()->route($this->webroute_path . 'index')->withStatus(__('crud.item_has_been_added', ['item' => __($this->title)]));
+        }
     }
 
     /**
@@ -150,7 +219,8 @@ class CouponsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authChecker();
+        //$this->authChecker();
+        if(auth()->user()->hasRole('owner') || auth()->user()->hasRole('admin')) {
         $item = $this->provider::findOrFail($id);
         $item->name = $request->name;
         $item->type = $request->type;
@@ -162,6 +232,7 @@ class CouponsController extends Controller
         $item->update();
 
         return redirect()->route($this->webroute_path.'index')->withStatus(__('crud.item_has_been_updated', ['item'=>__($this->title)]));
+        }
     }
 
     /**
@@ -172,18 +243,22 @@ class CouponsController extends Controller
      */
     public function destroy($id)
     {
-        $this->authChecker();
+        //$this->authChecker();
+        if(auth()->user()->hasRole('owner') || auth()->user()->hasRole('admin')) {
         $item = $this->provider::findOrFail($id);
         $item->delete();
 
         //TODO -- Delete customers from this table
         return redirect()->route($this->webroute_path.'index')->withStatus(__('crud.item_has_been_removed', ['item'=>__($this->title)]));
+        }
     }
 
-    public function apply(Request $request)
+    public function apply(Request $request, $code)
     {
+
+        //dd($request->all());
         //'data' => Cart::getContent(),
-        $coupon = Coupons::where(['code' => $request->code])->get()->first();
+        $coupon = Coupons::where(['code' => $code])->get()->first();
 
         $dateActive = false;
 
@@ -198,8 +273,13 @@ class CouponsController extends Controller
             $coupon->decrement('limit_to_num_uses');
             $coupon->increment('used_count');
 
+            /*return response()->json([
+                'status' => true,
+                'errMsg' => '',
+            ]);*/
+
             return response()->json([
-                'total' => $total,
+               'total' => $coupon->price,
                 'status' => true,
                 'msg' => __('Coupon code applied successfully.'),
             ]);
@@ -213,7 +293,8 @@ class CouponsController extends Controller
             $percentInDecimal = $percentToGet / 100;
 
             //Get the result.
-            $percent = $percentInDecimal * $myNumber;
+            $percent = round($percentInDecimal * $myNumber) ;
+
 
             $total = number_format((float) Cart::getSubTotal() - $percent, 2, '.', '');
 
@@ -221,9 +302,9 @@ class CouponsController extends Controller
             $coupon->increment('used_count');
 
             return response()->json([
-                'total' => $total,
+                'total' => $percent,
                 'status' => true,
-                'msg' => __('Coupon code applied successfully.'),
+                'msg'=> __('Coupon code applied successfully.'),
             ]);
         } else {
             return response()->json([

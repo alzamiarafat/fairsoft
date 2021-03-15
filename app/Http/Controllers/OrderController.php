@@ -209,12 +209,6 @@ class OrderController extends Controller
             $stripe_token=$request->stripePaymentId;
         }
 
-        //Custom fields
-        $customFields=[];
-        if($request->has('custom')){
-            $customFields=$request->custom;
-        }
-
         //DELIVERY METHOD
         //Default - pickup - since available everywhere
         $delivery_method="delivery";
@@ -228,8 +222,6 @@ class OrderController extends Controller
         if($request->has('dineType')){
             $delivery_method=$request->dineType;
         }
-
-
 
         //In case it is QR, and there is no dineInType, and pickup is diabled, it is dine in
         if(config('app.isqrsaas')&&!$request->has('dineType')&&!config('settings.is_whatsapp_ordering_mode')){
@@ -269,7 +261,6 @@ class OrderController extends Controller
             'total_price' => $request->total_price,
 
         ];
-        
 
 //        dd($requestData);
         return new Request($requestData);
@@ -375,10 +366,6 @@ class OrderController extends Controller
         ConfChanger::switchLanguage($order->restorant);
 
         $drivers = User::role('driver')->get();
-        $driversData = [];
-        foreach ($drivers as $key => $driver) {
-            $driversData[$driver->id] = $driver->name;
-        }
 
         if (auth()->user()->hasRole('client') && auth()->user()->id == $order->client_id ||
             auth()->user()->hasRole('owner') && auth()->user()->id == $order->restorant->user->id ||
@@ -752,7 +739,7 @@ class OrderController extends Controller
             [
                 'rating' => $rating->rating,
                 'is_rated' => $is_rated,
-                ]
+            ]
         );
     }
 
@@ -852,14 +839,14 @@ class OrderController extends Controller
     }
 
     public function success(Request $request)
-    {   
+    {
         $order = Order::findOrFail($request->order);
 
         //If order is not paid - redirect to payment
         if($request->redirectToPayment.""=="1"&&$order->payment_status != 'paid'&&strlen($order->payment_link)>5){
             //Redirect to payment
             return redirect($order->payment_link);
-        } 
+        }
 
         //If we have whatsapp send
         if($request->has('whatsapp')){
@@ -884,7 +871,24 @@ class OrderController extends Controller
             }
         }
 
-        
+
         return view('orders.success', ['order' => $order,'showWhatsApp'=>$showWhatsApp]);
     }
+    public function confirm(Request $request)
+    {
+        return view('orders.confirm');
+    }
+
+    public function prints(Order $order){
+
+        /*$data['print_data'] = Order::with('client', 'address')->get();
+        dd($data);
+        return view('orders.print', $data);*/
+
+        return view('orders.print', ['order'=>$order/*, 'statuses'=>Status::pluck('name', 'id'), 'drivers'=>$drivers*/]);
+
+
+    }
+
+        /*return view('orders.print');*/
 }

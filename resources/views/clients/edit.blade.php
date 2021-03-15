@@ -34,17 +34,17 @@
 
                                 <div class="form-group{{ $errors->has('name_client') ? ' has-danger' : '' }}">
                                     <label class="form-control-label" for="name_client">{{ __('Client Name') }}</label>
-                                    <input type="text" name="name_client" id="name_client" class="form-control form-control-alternative" placeholder="{{ __('Client Name') }}" value="{{ old('name', $client->name) }}" readonly>
+                                    <input type="text" name="name_client" id="name_client" class="form-control form-control-alternative" placeholder="{{ __('Client Name') }}" value="{{ old('name', $client->name) }}" >
                                 </div>
 
                                 <div class="form-group{{ $errors->has('email_client') ? ' has-danger' : '' }}">
                                     <label class="form-control-label" for="email_client">{{ __('Client Email') }}</label>
-                                    <input type="text" name="email_client" id="email_client" class="form-control form-control-alternative" placeholder="{{ __('Client Email') }}" value="{{ old('name', $client->email) }}" readonly>
+                                    <input type="text" name="email_client" id="email_client" class="form-control form-control-alternative" placeholder="{{ __('Client Email') }}" value="{{ old('name', $client->email) }}" >
                                 </div>
 
                                 <div class="form-group{{ $errors->has('phone_client') ? ' has-danger' : '' }}">
                                     <label class="form-control-label" for="phone_client">{{ __('Client Phone') }}</label>
-                                    <input type="text" name="phone_client" id="phone_client" class="form-control form-control-alternative" placeholder="{{ __('Client Phone') }}" value="{{ old('name', $client->phone) }}" readonly>
+                                    <input type="text" name="phone_client" id="phone_client" class="form-control form-control-alternative" placeholder="{{ __('Client Phone') }}" value="{{ old('name', $client->phone) }}" >
                                 </div>
                             </div>
                     </div>

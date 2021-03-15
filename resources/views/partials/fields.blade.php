@@ -14,7 +14,4 @@
     @if ($field['ftype']=="bool")
         @include('partials.bool',$field)
     @endif
-    @if ($field['ftype']=="textarea")
-        @include('partials.textarea',$field)
-    @endif
 @endforeach

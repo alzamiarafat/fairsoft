@@ -15,11 +15,16 @@
                             </div>
                             <div class="col-4 text-right">
                                 <a href="{{ route('orders.index') }}" class="btn btn-sm btn-primary">{{ __('Back') }}</a>
+                                <a class="btn badge badge-info" href="{{ route('orders.edit',$order->id )}}">Print</a>
                             </div>
+                            @include('orders.partials.actions.buttons',['order'=>$order])
+
                         </div>
                     </div>
                    @include('orders.partials.orderinfo')
-                   @include('orders.partials.actions.buttons',['order'=>$order])
+
+                    {{--<a class="btn badge badge-success badge-pill" href="'/print$order->id">Print this page</a>--}}
+                    {{--<a class="btn badge badge-success badge-pill" href="{{ route('orders.edit',$order->id )}}">#{{ $order->id }}</a>--}}
                 </div>
             </div>
             <div class="col-xl-5  mb-5 mb-xl-0">
@@ -43,7 +48,7 @@
                     
                 </div>
                 @if(auth()->user()->hasRole('client'))
-                @if($order->status->pluck('alias')->last() == "delivered")
+                @if($order->status()->select('status.*')->pluck('alias')->last() == "delivered")
                     <br/>
                     @include('orders.partials.rating',['order'=>$order])
                 @endif
